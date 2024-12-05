@@ -1,46 +1,45 @@
-import React, { useState } from 'react';
-import Login from './components/Login';
-import Register from './components/Register';
+import React, { useState } from "react";
+import AuthCard from "./components/AuthCard";
+import RegisterForm from "./components/RegisterForm";
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [userWallet, setUserWallet] = useState(null);
-    const [isRegistered, setIsRegistered] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [isRegistering, setIsRegistering] = useState(false);
 
-    // Maneja el login de la wallet
-    const handleLogin = async (wallet) => {
-        setUserWallet(wallet);
+    function handleLogin(user) {
+        setCurrentUser(user); // Almacena el usuario logueado
+    }
 
-        // Verificar si el usuario ya está registrado
-        const userExists = false; // Cambiar por una llamada real al backend o blockchain
-        if (userExists) {
-            console.log("Usuario ya registrado");
-            setIsRegistered(true);
-        } else {
-            console.log("Usuario no registrado");
-            setIsRegistered(false);
-        }
-
-        setIsAuthenticated(true);
-    };
-
-    // Maneja el registro de un nuevo usuario
-    const handleRegister = (userData) => {
-        console.log("Usuario registrado con éxito:", userData);
-        setIsRegistered(true);
-    };
+    function toggleRegister() {
+        setIsRegistering(!isRegistering); // Cambia entre login y registro
+    }
 
     return (
         <div>
-            {!isAuthenticated ? (
-                <Login onLogin={handleLogin} />
-            ) : !isRegistered ? (
-                <Register walletAddress={userWallet} onRegister={handleRegister} />
+            {!currentUser ? (
+                isRegistering ? (
+                    <RegisterForm onRegister={() => setIsRegistering(false)} />
+                ) : (
+                    <AuthCard onLogin={handleLogin} />
+                )
             ) : (
                 <div>
-                    <h1>¡Bienvenido a la Librería Descentralizada!</h1>
-                    <p>Tu wallet: {userWallet}</p>
+                    <h1>Welcome, {currentUser.firstName}!</h1>
+                    <p>You are now logged in.</p>
                 </div>
+            )}
+            {!currentUser && (
+                <p style={{ textAlign: "center", marginTop: "1rem" }}>
+                    {isRegistering ? (
+                        <span onClick={toggleRegister} style={{ color: "#007bff", cursor: "pointer" }}>
+                            Already have an account? Login here.
+                        </span>
+                    ) : (
+                        <span onClick={toggleRegister} style={{ color: "#007bff", cursor: "pointer" }}>
+                            Don't have an account? Register here.
+                        </span>
+                    )}
+                </p>
             )}
         </div>
     );
