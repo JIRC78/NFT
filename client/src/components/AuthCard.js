@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 
-function AuthCard({ onLogin }) {
+function AuthCard({ onLogin, onToggleRegister }) {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     async function handleLogin() {
         try {
@@ -23,11 +24,11 @@ function AuthCard({ onLogin }) {
                 alert(`Welcome back, ${data.user.firstName}!`);
                 onLogin(data.user); // Envía los datos del usuario logueado al componente padre
             } else {
-                alert("User not found. Please register.");
+                setErrorMessage("User not found. Please register.");
             }
         } catch (error) {
             console.error("Error during login:", error);
-            alert("Failed to login. Please try again.");
+            setErrorMessage("Failed to login. Please try again.");
         }
     }
 
@@ -52,7 +53,10 @@ function AuthCard({ onLogin }) {
                 <button style={styles.button} onClick={handleLogin}>
                     Login
                 </button>
-                <p style={styles.link}>Don't have an account? Register here.</p>
+                {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+                <p style={styles.link} onClick={onToggleRegister}>
+                    Don't have an account? Register here.
+                </p>
             </div>
         </div>
     );

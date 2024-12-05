@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function RegisterForm() {
+function RegisterForm({ onRegister }) {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [message, setMessage] = useState("");
@@ -18,7 +18,8 @@ function RegisterForm() {
             }
 
             const data = await response.json();
-            setMessage(`User registered successfully! Transaction hash: ${data.receipt.transactionHash}`);
+            setMessage("User registered successfully!");
+            onRegister(); // Cambia a la vista de login después de registrar
         } catch (error) {
             console.error("Error registering user:", error);
             setMessage("Registration failed. Please try again.");

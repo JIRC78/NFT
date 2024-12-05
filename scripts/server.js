@@ -57,14 +57,17 @@ app.post('/users', async (req, res) => {
 });
 
 // Endpoint para verificar si el usuario está registrado
-app.get('/api/check-user/:address', async (req, res) => {
-    const address = req.params.address;
+app.post('/api/check-user', async (req, res) => {
+    const { firstName, lastName } = req.body;
     try {
-        // Llama a la función `getUsers` para obtener todos los usuarios registrados
-        const users = await getUsers(); // `getUsers` está en tu controlador user.js
+        const users = await getUsers(); // Llama a getUsers para obtener todos los usuarios
 
-        // Busca si la dirección está en la lista de usuarios
-        const user = users.find((user) => user.walletAddress === address);
+        // Busca al usuario por `firstName` y `lastName`
+        const user = users.find(
+            (user) =>
+                user.firstName.toLowerCase() === firstName.toLowerCase() &&
+                user.lastName.toLowerCase() === lastName.toLowerCase()
+        );
 
         if (user) {
             res.status(200).json({ isRegistered: true, user });
@@ -76,6 +79,7 @@ app.get('/api/check-user/:address', async (req, res) => {
         res.status(500).json({ error: "Failed to check user registration" });
     }
 });
+
 
 
 // Endpoint para mostrar la transacción en el explorador de blockchain

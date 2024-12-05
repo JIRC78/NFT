@@ -7,7 +7,7 @@ function App() {
     const [isRegistering, setIsRegistering] = useState(false);
 
     function handleLogin(user) {
-        setCurrentUser(user); // Almacena el usuario logueado
+        setCurrentUser(user); // Guarda al usuario logueado
     }
 
     function toggleRegister() {
@@ -20,26 +20,13 @@ function App() {
                 isRegistering ? (
                     <RegisterForm onRegister={() => setIsRegistering(false)} />
                 ) : (
-                    <AuthCard onLogin={handleLogin} />
+                    <AuthCard onLogin={handleLogin} onToggleRegister={toggleRegister} />
                 )
             ) : (
                 <div>
                     <h1>Welcome, {currentUser.firstName}!</h1>
                     <p>You are now logged in.</p>
                 </div>
-            )}
-            {!currentUser && (
-                <p style={{ textAlign: "center", marginTop: "1rem" }}>
-                    {isRegistering ? (
-                        <span onClick={toggleRegister} style={{ color: "#007bff", cursor: "pointer" }}>
-                            Already have an account? Login here.
-                        </span>
-                    ) : (
-                        <span onClick={toggleRegister} style={{ color: "#007bff", cursor: "pointer" }}>
-                            Don't have an account? Register here.
-                        </span>
-                    )}
-                </p>
             )}
         </div>
     );
