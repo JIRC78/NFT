@@ -34,7 +34,7 @@
 //         console.error(error);
 //         process.exit(1);
 //     });
-const { ethers } = require("hardhat");
+//const { ethers } = require("hardhat");
 
 // async function main() {
 //     const NFT = await ethers.getContractFactory("Users"); // Asegúrate de que "NFTClase" sea el nombre correcto del contrato
@@ -54,16 +54,38 @@ const { ethers } = require("hardhat");
 //     });
 
 
-    async function multiDeploy(){
-        const owner = ["0x05aBA7873F2C749Ad63f2d7E2F13f6a95761d745", "0x68efA4cf43896096eBd76149ad71D837f02692b9"] // aqui van las cuentas
-        const requiredApprovals = 2;
-        const WalletMultiSig = await ethers.getContractFactory("WalletMultisig");
-        const wallet = await WalletMultiSig.deploy(owner,requiredApprovals);
-        console.log("WalletMultiSig deployed to:", wallet.address);
-    }
+    //async function multiDeploy(){
+      //  const owner = ["0x05aBA7873F2C749Ad63f2d7E2F13f6a95761d745", "0x68efA4cf43896096eBd76149ad71D837f02692b9"] // aqui van las cuentas
+       // const requiredApprovals = 2;
+        //const WalletMultiSig = await ethers.getContractFactory("WalletMultisig");
+        //const wallet = await WalletMultiSig.deploy(owner,requiredApprovals);
+        //console.log("WalletMultiSig deployed to:", wallet.address);
+    //}
 
     
-multiDeploy().then(()=>process.exit(0)).catch((error)=>{
-    console.error(error);
-    process.exit(1);
-})
+//multiDeploy().then(()=>process.exit(0)).catch((error)=>{
+  //  console.error(error);
+    //process.exit(1);
+//})
+const { ethers } = require("hardhat");
+
+async function main() {
+    // Obtén la fábrica del contrato `BookRegistry`
+    const BookRegistry = await ethers.getContractFactory("BookRegistry");
+
+    // Despliega el contrato
+    const bookRegistry = await BookRegistry.deploy();
+    await bookRegistry.deployed();
+
+    // Imprime la dirección del contrato desplegado
+    console.log("BookRegistry deployed to:", bookRegistry.address);
+}
+
+// Ejecuta el script
+main()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });
+

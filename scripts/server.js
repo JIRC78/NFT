@@ -9,6 +9,9 @@ app.use(cors());
 // Middleware para manejar JSON
 app.use(express.json());
 
+const bookRoutes = require("../routers/bookRoutes.js");
+app.use("/books", bookRoutes);
+
 // Ruta para obtener todos los tokens
 app.get('/tokens', async (req, res) => {
     try {

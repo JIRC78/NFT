@@ -4,8 +4,9 @@ const FormData = require('form-data')
 const axios = require('axios')
 const {ethers} = require('ethers')
 
-//Tomar el archivo json que está dentro de los contratos
-const contract = require('../artifacts/contracts/NFTContract.sol/NFTClase.json')
+const contract = require('../artifacts/contracts/NFTContract.sol/NFTClase.json'); // Mantén esto como 'contract'
+const bookRegistryContract = require('../artifacts/contracts/BookRegistry.sol/BookRegistry.json'); // Agrega el nuevo contrato
+
 
 const {
     PRIVATE_KEY,
@@ -190,7 +191,25 @@ async function mintNFT(tokenURI) {
     return etherscanURL; // Regresa la URL de la transacción
 }
 
-module.exports = { mintNFT, createImgInfo, createJsonInfo, getAllTokenIds, getTokenIdsByAccount };
+async function registerBook(title, author, description) {
+    const provider = new ethers.providers.JsonRpcProvider(API_URL);
+    const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
+    const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, bookRegistryContract.abi, wallet);
+
+    try {
+        const tx = await contractInstance.registerBook(title, author, description);
+        await tx.wait();
+        console.log(`Book registered successfully: ${tx.hash}`);
+        return tx.hash;
+    } catch (error) {
+        console.error("Error registering book:", error);
+        throw error;
+    }
+}
+
+
+
+module.exports = { mintNFT, createImgInfo, createJsonInfo, getAllTokenIds, getTokenIdsByAccount,registerBook,  };
 
 //getTokenIdsByAccount('0x05aBA7873F2C749Ad63f2d7E2F13f6a95761d745');
 
