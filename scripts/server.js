@@ -7,7 +7,7 @@ const cors = require('cors');
 const { getAllTokenIds, getTokenIdsByAccount, mintNFT, registerAndTokenizeBook } = require('./nfts.js');
 const { createUser, getUsers } = require('../controllers/user.js'); // Verifica que esta ruta sea correcta
 
-const bookRoutes = require("./routers/bookRoutes"); // Asegúrate de que esta ruta sea correcta
+const bookRoutes = require("../routers/bookRoutes.js"); // Asegúrate de que esta ruta sea correcta
 
 app.use(cors());
 app.use(express.json()); // Middleware para parsear JSON

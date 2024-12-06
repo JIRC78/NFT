@@ -19,8 +19,15 @@ function BookList({ books = [] }) {
                         <div style={styles.bookIndex}>{index + 1}</div>
                         <div style={styles.bookDetails}>
                             <h3 style={styles.bookTitle}>{book.title}</h3>
-                            <p style={styles.bookAuthor}>{book.author}</p>
+                            <p style={styles.bookAuthor}>By: {book.author}</p>
                             <p style={styles.bookDescription}>{book.description}</p>
+                            {book.image && (
+                                <img
+                                    src={book.image}
+                                    alt={`${book.title} cover`}
+                                    style={styles.bookImage}
+                                />
+                            )}
                         </div>
                     </div>
                 ))}
@@ -36,7 +43,7 @@ const styles = {
         backgroundColor: "#ffffff",
         borderRadius: "10px",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        maxWidth: "90%", // Hacer el contenedor más ancho
+        maxWidth: "90%",
         marginLeft: "auto",
         marginRight: "auto",
     },
@@ -93,6 +100,12 @@ const styles = {
     bookDescription: {
         fontSize: "0.9rem",
         color: "#495057",
+    },
+    bookImage: {
+        marginTop: "10px",
+        maxWidth: "100%",
+        maxHeight: "200px",
+        borderRadius: "5px",
     },
 };
 

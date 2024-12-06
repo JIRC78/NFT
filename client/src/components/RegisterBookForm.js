@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function RegisterBookForm({ onBooksUpdated }) {
+function RegisterBookForm({ onBooksUpdated, onChangeView }) {
     const [title, setTitle] = useState("");
     const [author, setAuthor] = useState("");
     const [description, setDescription] = useState("");
@@ -12,31 +12,51 @@ function RegisterBookForm({ onBooksUpdated }) {
                 alert("Por favor, completa todos los campos.");
                 return;
             }
-
+    
             setMessage("Registrando libro y generando NFT...");
-
-            // Llamar al backend para registrar y tokenizar el libro
+    
+            // Paso 2: Generar la imagen para el NFT usando una API
+            const generatedImageUrl = `https://picsum.photos/seed/${title}-${author}-${description}/512/512`;
+    
+            // Paso 3: Crear metadatos del NFT
+            const metadata = {
+                image: generatedImageUrl, // Incluye la URL generada
+                name: title,
+                description: description,
+                attributes: [{ trait_type: "Author", value: author }],
+            };
+    
+            // Envía la imagen y los datos al backend como parte de la solicitud para registrar y tokenizar
             const response = await fetch("http://localhost:3000/books/register-tokenize", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, author, description }),
+                body: JSON.stringify({
+                    title,
+                    author,
+                    description,
+                    image: generatedImageUrl, // Incluye la URL de la imagen
+                }),
             });
-
+    
             if (!response.ok) {
                 throw new Error("Error registrando el libro y creando NFT.");
             }
-
+    
             const data = await response.json();
             setMessage(`¡Libro registrado y NFT creado! TxHash: ${data.nftTransactionHash}`);
             onBooksUpdated(); // Actualiza la lista de libros
             setTitle("");
             setAuthor("");
             setDescription("");
+
+            // Cambiar automáticamente a la vista de la lista
+            onChangeView();
         } catch (error) {
             console.error("Error registrando libro y creando NFT:", error);
             setMessage("Error registrando libro y creando NFT. Intenta de nuevo.");
         }
     }
+    
 
     return (
         <div style={styles.formContainer}>
@@ -122,4 +142,3 @@ const styles = {
 };
 
 export default RegisterBookForm;
-

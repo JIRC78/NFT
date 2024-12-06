@@ -70,7 +70,10 @@ function App() {
                         {view === "list" ? (
                             <BookList books={books} />
                         ) : (
-                            <RegisterBookForm onBooksUpdated={fetchBooks} />
+                            <RegisterBookForm
+                                onBooksUpdated={fetchBooks}
+                                onChangeView={() => setView("list")} // Cambiar a la vista de la lista después de registrar un libro
+                            />
                         )}
                     </main>
                 </>

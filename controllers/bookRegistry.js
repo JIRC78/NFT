@@ -49,8 +49,6 @@ async function getBooks(req, res) {
     try {
         const bookCount = await bookRegistryContract.bookCount();
         const books = [];
-
-        // Iterar sobre los libros registrados
         for (let i = 0; i < bookCount; i++) {
             const book = await bookRegistryContract.getBook(i);
             books.push({
@@ -58,15 +56,16 @@ async function getBooks(req, res) {
                 author: book.author,
                 description: book.description,
                 owner: book.owner,
+                image: book.image, // Asegúrate de incluir el campo `image` si está en el contrato
             });
         }
-
-        console.log("Books fetched successfully:", books);
         res.status(200).json(books);
     } catch (error) {
         console.error("Error fetching books:", error);
         res.status(500).json({ error: "Error fetching books" });
     }
 }
+
+
 
 module.exports = { registerBook, getBooks };
