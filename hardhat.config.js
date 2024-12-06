@@ -1,6 +1,6 @@
 require('dotenv').config();
 require('@nomiclabs/hardhat-ethers');
-const PRIVATE_KEY='1d65c02ba56f02c578e665c51db2640d20551768ddea836df52c58b2ad5f73b6'
+const PRIVATE_KEY='d5442de4954c2cd5030928d6362186b167f026eb0e6df232865796988b1c9ac0'
 const API_URL='https://eth-sepolia.g.alchemy.com/v2/twi8dA6tApldJjmR9KS65kXWgEq6hd5o'
 
 module.exports = {
