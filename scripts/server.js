@@ -1,16 +1,53 @@
 const express = require('express');
+const multer = require('multer'); // Importa multer
+const cors = require('cors');
+const path = require('path');
+
+const { getAllTokenIds, getTokenIdsByAccount, mintNFT, registerAndTokenizeBook } = require('./nfts.js');
+const { createUser, getUsers } = require('../controllers/user.js'); // Asegúrate de que esta ruta es correcta
+
 const app = express();
 const port = 3000;
-const cors = require('cors');
 
-const { getAllTokenIds, getTokenIdsByAccount, mintNFT } = require('./nfts.js');
-const { createUser, getUsers } = require('../controllers/user.js'); // Asegúrate de que esta ruta es correcta
+// Configuración de multer para manejo de archivos
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Carpeta donde se guardarán los archivos
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname); // Nombre único para cada archivo
+    },
+});
+const upload = multer({ storage: storage });
+
+// Middleware
 app.use(cors());
-// Middleware para manejar JSON
 app.use(express.json());
 
+// Asegúrate de que la carpeta de uploads exista
+const fs = require('fs');
+const uploadsDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
+
+// Importa rutas
 const bookRoutes = require("../routers/bookRoutes.js");
 app.use("/books", bookRoutes);
+
+// Ruta para registrar y tokenizar un libro
+app.post("/books/register-tokenize", upload.single("image"), async (req, res) => {
+    const { title, author, description } = req.body;
+    const imagePath = req.file ? req.file.path : null; // Verifica si se subió una imagen
+
+    try {
+        const result = await registerAndTokenizeBook(title, author, description, imagePath);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error("Error registering and tokenizing book:", error);
+        res.status(500).json({ error: "Failed to register and tokenize book" });
+    }
+});
 
 // Ruta para obtener todos los tokens
 app.get('/tokens', async (req, res) => {
@@ -83,8 +120,6 @@ app.post('/api/check-user', async (req, res) => {
     }
 });
 
-
-
 // Endpoint para mostrar la transacción en el explorador de blockchain
 app.get('/transaction/:hash', (req, res) => {
     const transactionHash = req.params.hash;
@@ -92,6 +127,7 @@ app.get('/transaction/:hash', (req, res) => {
     res.status(200).json({ success: true, etherscanURL });
 });
 
+// Inicia el servidor
 app.listen(port, () => {
     console.log(`Servidor escuchando en http://localhost:${port}`);
 });

@@ -207,9 +207,46 @@ async function registerBook(title, author, description) {
     }
 }
 
+async function registerAndTokenizeBook(title, author, description, imagePath) {
+    try {
+        // Paso 1: Registrar el libro en BookRegistry.sol
+        const provider = new ethers.providers.JsonRpcProvider(API_URL);
+        const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
+        const bookRegistryInstance = new ethers.Contract(CONTRACT_ADDRESS, bookRegistryContract.abi, wallet);
+
+        const tx = await bookRegistryInstance.registerBook(title, author, description);
+        await tx.wait();
+        console.log(`Book registered successfully: ${tx.hash}`);
+
+        // Paso 2: Subir la imagen a IPFS
+        const imageUri = await createImgInfo(imagePath);
+
+        // Paso 3: Crear metadatos JSON para el NFT
+        const metadata = {
+            image: imageUri,
+            name: title,
+            description: description,
+            attributes: [
+                { trait_type: 'Author', value: author },
+            ]
+        };
+        const tokenUri = await createJsonInfo(metadata);
+
+        // Paso 4: Crear el NFT en NFTContract.sol
+        const nftHash = await mintNFT(tokenUri);
+        console.log(`NFT minted successfully: ${nftHash}`);
+
+        return { bookTransactionHash: tx.hash, nftTransactionHash: nftHash };
+    } catch (error) {
+        console.error("Error registering and tokenizing book:", error);
+        throw error;
+    }
+}
 
 
-module.exports = { mintNFT, createImgInfo, createJsonInfo, getAllTokenIds, getTokenIdsByAccount,registerBook,  };
+
+
+module.exports = { mintNFT, createImgInfo, createJsonInfo, getAllTokenIds, getTokenIdsByAccount,registerBook, registerAndTokenizeBook, createNFT,  };
 
 //getTokenIdsByAccount('0x05aBA7873F2C749Ad63f2d7E2F13f6a95761d745');
 
