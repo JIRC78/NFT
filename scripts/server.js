@@ -1,51 +1,29 @@
 const express = require('express');
-const multer = require('multer'); // Importa multer
-const cors = require('cors');
-const path = require('path');
-
-const { getAllTokenIds, getTokenIdsByAccount, mintNFT, registerAndTokenizeBook } = require('./nfts.js');
-const { createUser, getUsers } = require('../controllers/user.js'); // Asegúrate de que esta ruta es correcta
-
 const app = express();
 const port = 3000;
+const cors = require('cors');
 
-// Configuración de multer para manejo de archivos
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/'); // Carpeta donde se guardarán los archivos
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname); // Nombre único para cada archivo
-    },
-});
-const upload = multer({ storage: storage });
+// Importaciones
+const { getAllTokenIds, getTokenIdsByAccount, mintNFT, registerAndTokenizeBook } = require('./nfts.js');
+const { createUser, getUsers } = require('../controllers/user.js'); // Verifica que esta ruta sea correcta
 
-// Middleware
+const bookRoutes = require("./routers/bookRoutes"); // Asegúrate de que esta ruta sea correcta
+
 app.use(cors());
-app.use(express.json());
-
-// Asegúrate de que la carpeta de uploads exista
-const fs = require('fs');
-const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir);
-}
-
-// Importa rutas
-const bookRoutes = require("../routers/bookRoutes.js");
+app.use(express.json()); // Middleware para parsear JSON
 app.use("/books", bookRoutes);
 
 // Ruta para registrar y tokenizar un libro
-app.post("/books/register-tokenize", upload.single("image"), async (req, res) => {
+app.post("/books/register-tokenize", async (req, res) => {
     const { title, author, description } = req.body;
-    const imagePath = req.file ? req.file.path : null; // Verifica si se subió una imagen
 
     try {
-        const result = await registerAndTokenizeBook(title, author, description, imagePath);
+        // Llamar a la lógica de tokenización en `nfts.js`
+        const result = await registerAndTokenizeBook(title, author, description);
         res.status(200).json(result);
     } catch (error) {
-        console.error("Error registering and tokenizing book:", error);
-        res.status(500).json({ error: "Failed to register and tokenize book" });
+        console.error("Error registrando y tokenizando libro:", error);
+        res.status(500).json({ error: "Error al registrar y tokenizar el libro." });
     }
 });
 
@@ -75,7 +53,7 @@ app.get('/users/:wallet', async (req, res) => {
     const wallet = req.params.wallet;
     try {
         const user = await getUsers(wallet);
-        if (user.firstName) {
+        if (user && user.firstName) {
             res.status(200).json(user);
         } else {
             res.status(404).json({ error: 'Usuario no encontrado' });
@@ -100,7 +78,7 @@ app.post('/users', async (req, res) => {
 app.post('/api/check-user', async (req, res) => {
     const { firstName, lastName } = req.body;
     try {
-        const users = await getUsers(); // Llama a getUsers para obtener todos los usuarios
+        const users = await getUsers();
 
         // Busca al usuario por `firstName` y `lastName`
         const user = users.find(

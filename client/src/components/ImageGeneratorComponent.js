@@ -1,40 +1,28 @@
 import React, { useState } from "react";
 import "./ImageGeneratorComponent.css";
-import { mintNFT } from "../scripts/nfts"; // Asegúrate de importar tu función `mintNFT`
 
 const ImageGeneratorComponent = () => {
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState(null);
-  const [message, setMessage] = useState("");
 
-  const handleGenerateImage = async () => {
+  const handleGenerateImage = () => {
     if (!description) {
       alert("Por favor, ingresa una descripción.");
       return;
     }
 
-    // Generar una imagen con Lorem Picsum
+    // Usaremos la API de Lorem Picsum con un ID generado por descripción
     const id = description
       .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0) % 1000;
+      .reduce((acc, char) => acc + char.charCodeAt(0), 0) % 1000; // Genera un número pseudoaleatorio basado en la descripción
     const generatedImageUrl = `https://picsum.photos/seed/${id}/512/512`;
-    setImageUrl(generatedImageUrl);
 
-    // Ahora mintar el NFT con la imagen generada
-    try {
-      setMessage("Mintando NFT, espera por favor...");
-      const tokenURI = generatedImageUrl; // La URL de la imagen será el tokenURI
-      const txHash = await mintNFT(tokenURI); // Mintar el NFT con la URL de la imagen
-      setMessage(`¡NFT Mintado! TxHash: ${txHash}`);
-    } catch (error) {
-      console.error("Error mintando NFT:", error);
-      setMessage("Error al mintar el NFT. Intenta de nuevo.");
-    }
+    setImageUrl(generatedImageUrl);
   };
 
   return (
     <div className="image-generator">
-      <h3>Generar Imagen y Mintar NFT</h3>
+      <h3>Generar Imagen</h3>
       <input
         type="text"
         placeholder="Escribe una descripción..."
@@ -43,7 +31,7 @@ const ImageGeneratorComponent = () => {
         className="description-input"
       />
       <button onClick={handleGenerateImage} className="generate-button">
-        Generar Imagen y Mintar NFT
+        Generar Imagen
       </button>
       {imageUrl && (
         <div className="image-container">
@@ -51,7 +39,6 @@ const ImageGeneratorComponent = () => {
           <img src={imageUrl} alt="Generado por descripción" className="generated-image" />
         </div>
       )}
-      {message && <p>{message}</p>}
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { mintNFT, createImgInfo, createJsonInfo } from "../scripts/nfts"; // Asegúrate de importar estas funciones
 
 function RegisterBookForm({ onBooksUpdated }) {
     const [title, setTitle] = useState("");
@@ -16,36 +15,19 @@ function RegisterBookForm({ onBooksUpdated }) {
 
             setMessage("Registrando libro y generando NFT...");
 
-            // Paso 1: Registrar el libro en el backend
-            const bookResponse = await fetch("http://localhost:3000/books/register", {
+            // Llamar al backend para registrar y tokenizar el libro
+            const response = await fetch("http://localhost:3000/books/register-tokenize", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ title, author, description }),
             });
 
-            if (!bookResponse.ok) {
-                throw new Error("Error registrando el libro.");
+            if (!response.ok) {
+                throw new Error("Error registrando el libro y creando NFT.");
             }
 
-            // Paso 2: Generar la imagen para el NFT usando una API
-            const generatedImageUrl = `https://picsum.photos/seed/${title}-${author}-${description}/512/512`;
-
-            // Paso 3: Crear metadatos del NFT
-            const metadata = {
-                image: generatedImageUrl,
-                name: title,
-                description: description,
-                attributes: [
-                    { trait_type: "Author", value: author },
-                ],
-            };
-
-            const tokenURI = await createJsonInfo(metadata);
-
-            // Paso 4: Mintar el NFT
-            const nftTransactionHash = await mintNFT(tokenURI);
-
-            setMessage(`Libro registrado y NFT creado exitosamente. TxHash: ${nftTransactionHash}`);
+            const data = await response.json();
+            setMessage(`¡Libro registrado y NFT creado! TxHash: ${data.nftTransactionHash}`);
             onBooksUpdated(); // Actualiza la lista de libros
             setTitle("");
             setAuthor("");
@@ -140,3 +122,4 @@ const styles = {
 };
 
 export default RegisterBookForm;
+
